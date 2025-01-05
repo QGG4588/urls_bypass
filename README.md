@@ -38,6 +38,8 @@
    
 `python url_bypass_checker.py -u https://example.com/admin`
 
+![image](https://github.com/user-attachments/assets/9ba07ede-ffbc-4a76-b244-18a521c0c3bd)
+
 
 2. 批量检测 URL：
 
