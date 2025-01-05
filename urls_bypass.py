@@ -20,7 +20,7 @@ class URLBypassChecker:
         self.timeout = timeout
         self.max_workers = max_workers
         self.proxy = self._format_proxy(proxy) if proxy else None
-        self.default_bypass_file = Path(__file__).parent / "wordlists/url-bypass.txt"
+        self.default_bypass_file = Path(__file__).parent / "url-bypass.txt"
 
     def _format_proxy(self, proxy):
         """格式化代理地址"""
@@ -164,8 +164,16 @@ class URLBypassChecker:
                 status_groups[status] = []
             status_groups[status].append(result)
 
-        # 显示分组结果
-        for status in sorted(status_groups.keys()):
+        # 分别处理错误和正常状态码
+        # 首先显示错误信息
+        if 'ERROR' in status_groups:
+            print("\n[Status: ERROR]")
+            for result in status_groups['ERROR']:
+                print(f"{Fore.RED}{result['message']} - {result['url']}")
+            del status_groups['ERROR']
+
+        # 然后显示正常的状态码（数字）
+        for status in sorted(status_groups.keys(), key=lambda x: int(x) if x != 'ERROR' else -1):
             print(f"\n[Status: {status}]")
             for result in status_groups[status]:
                 if result['success']:
