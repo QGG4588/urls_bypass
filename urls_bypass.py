@@ -56,13 +56,25 @@ class URLBypassChecker:
             else:
                 path_parts = []
 
-            # 在每个路径段后添加 bypass 模式
             for i in range(len(path_parts) + 1):
-                current_parts = path_parts[:i] + [pattern] + path_parts[i:]
-                url = urllib.parse.urljoin(
-                    base_domain + '/',
-                    '/'.join(filter(None, current_parts))
-                )
+                if pattern.startswith('.'):
+                    # 以.开头的payload，拼接到前一个path segment后面
+                    if i == 0 and path_parts:
+                        # 拼到第一个path segment前面（极少见）
+                        new_parts = [path_parts[0] + pattern] + path_parts[1:]
+                    elif i > 0 and path_parts:
+                        # 拼到第i-1个path segment后面
+                        new_parts = path_parts[:i-1] + [path_parts[i-1] + pattern] + path_parts[i:]
+                    else:
+                        # 没有path segment，直接拼到根
+                        new_parts = [pattern]
+                    url = base_domain + '/' + '/'.join(new_parts)
+                else:
+                    # 其他payload，作为独立segment插入
+                    current_parts = path_parts[:i] + [pattern] + path_parts[i:]
+                    url = base_domain
+                    if current_parts:
+                        url += '/' + '/'.join(current_parts)
                 urls.add(url)
 
         return list(urls)
